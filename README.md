@@ -1,2 +1,2 @@
 # LearningQtOpenGLGLSL
-My learning project on FLSL
+My learning project on GLSL
