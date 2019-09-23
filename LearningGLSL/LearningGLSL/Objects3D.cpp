@@ -208,11 +208,22 @@ void Objects3D::initializeData(const char* file_name)
 				// point normal
 				m_vertices_data[i_num * 9 + i_data] = m_normals[m_vertex_indices[int(i_num / 3)][i_num % 3]][i_data - 3];
 				// face normal
-				m_vertices_data[i_num * 9 + i_data] = m_face_normals[int(i_num / 3)][i_data - 3];
+				// m_vertices_data[i_num * 9 + i_data] = m_face_normals[int(i_num / 3)][i_data - 3];
 			}
 			else
 			{
-				m_vertices_data[i_num * 9 + i_data] = 0.75f;
+				if (i_data % 3 == 0) // R
+				{
+					m_vertices_data[i_num * 9 + i_data] = 0.5f;
+				}
+				else if (i_data % 3 == 1) // G
+				{
+					m_vertices_data[i_num * 9 + i_data] = 0.5f;
+				}
+				else // B
+				{
+					m_vertices_data[i_num * 9 + i_data] = 1.0f;
+				}
 			}
 		}
 	}

@@ -160,7 +160,7 @@ void MainOpenGLWidget::paintGL()
 	m_world.rotate(m_zRot / 16.0f, 0, 0, 1);
 
 	m_a_light_pos = QVector3D(0.0, 2.0, 3.0);
-	m_a_light_pos = QVector3D(0.0, 2.0, -3.0);
+	m_b_light_pos = QVector3D(0.0, 2.0, -3.0);
 	m_view_pos = QVector3D(0.0, 0.0, 2.0);
 
 	m_shader->use();
