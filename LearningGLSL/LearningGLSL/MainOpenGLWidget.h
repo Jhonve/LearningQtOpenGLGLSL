@@ -11,6 +11,8 @@
 
 #include <Shader.h>
 
+#include "Objects3D.h"
+
 class MainOpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
 	Q_OBJECT
@@ -24,6 +26,8 @@ public:
 
 	QSize minimumSizeHint() const override;
 	QSize sizeHint() const override;
+
+	Objects3D* m_object_3d;
 
 public slots:
 	void setXRotation(int angle);
@@ -54,10 +58,17 @@ private:
 	int m_zRot;
 	QPoint m_lastPos;	// mouse's last position
 	int m_projMatrixLoc;	// vertices' projection matrix location
-	int m_mvMatrixLoc;		// vertices' move matrix location
+	int m_modelMatrixLoc;	// vertices' world matrix location
+	int m_viewMatrixLoc;	// vertices' camera matrix location
+	int m_aLightPosLoc;    // frag's A light position location
+	int m_bLightPosLoc;		// frag's B light position location
+	int  m_viewPosLoc;	// frag's view position location
 	QMatrix4x4 m_proj;	// project matrix
 	QMatrix4x4 m_camera;	// camera transform matrix
 	QMatrix4x4 m_world;		// world transform matrix
+	QVector3D m_a_light_pos;
+	QVector3D m_b_light_pos;
+	QVector3D m_view_pos;
 	static bool m_transparent;
 
 	bool m_is_reload;

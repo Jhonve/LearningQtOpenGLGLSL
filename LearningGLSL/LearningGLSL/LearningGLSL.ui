@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>532</width>
+    <width>1050</width>
     <height>530</height>
    </rect>
   </property>
@@ -14,10 +14,20 @@
    <string>LearningGLSL</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="MainOpenGLWidget" name="OpenGLWidgetMain">
+   <widget class="MainOpenGLWidget" name="MOpenGLWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
+      <y>10</y>
+      <width>512</width>
+      <height>512</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TestOsgWidget" name="OpenSGWidget">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
       <y>10</y>
       <width>512</width>
       <height>512</height>
@@ -32,6 +42,11 @@
    <class>MainOpenGLWidget</class>
    <extends>QOpenGLWidget</extends>
    <header location="global">MainOpenGLWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TestOsgWidget</class>
+   <extends>QOpenGLWidget</extends>
+   <header location="global">TestOsgWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -14,6 +14,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QWidget>
+#include <TestOsgWidget.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -21,18 +22,22 @@ class Ui_LearningGLSLClass
 {
 public:
     QWidget *centralWidget;
-    MainOpenGLWidget *OpenGLWidgetMain;
+    MainOpenGLWidget *MOpenGLWidget;
+    TestOsgWidget *OpenSGWidget;
 
     void setupUi(QMainWindow *LearningGLSLClass)
     {
         if (LearningGLSLClass->objectName().isEmpty())
             LearningGLSLClass->setObjectName(QString::fromUtf8("LearningGLSLClass"));
-        LearningGLSLClass->resize(532, 530);
+        LearningGLSLClass->resize(1050, 530);
         centralWidget = new QWidget(LearningGLSLClass);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
-        OpenGLWidgetMain = new MainOpenGLWidget(centralWidget);
-        OpenGLWidgetMain->setObjectName(QString::fromUtf8("OpenGLWidgetMain"));
-        OpenGLWidgetMain->setGeometry(QRect(10, 10, 512, 512));
+        MOpenGLWidget = new MainOpenGLWidget(centralWidget);
+        MOpenGLWidget->setObjectName(QString::fromUtf8("MOpenGLWidget"));
+        MOpenGLWidget->setGeometry(QRect(10, 10, 512, 512));
+        OpenSGWidget = new TestOsgWidget(centralWidget);
+        OpenSGWidget->setObjectName(QString::fromUtf8("OpenSGWidget"));
+        OpenSGWidget->setGeometry(QRect(530, 10, 512, 512));
         LearningGLSLClass->setCentralWidget(centralWidget);
 
         retranslateUi(LearningGLSLClass);

@@ -1,12 +1,23 @@
 #version 450 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aColor;
-uniform mat4 projMatrix;
-uniform mat4 mvMatrix;
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec3 normal;
+layout (location = 2) in vec3 color;
 
-out vec3 our_color;
+uniform mat4 model_mat;
+uniform mat4 view_mat;
+uniform mat4 proj_mat;
 
-void main(){
-  gl_Position = projMatrix * mvMatrix * vec4(aPos, 1.0f) ;
-  our_color = aColor;
+out VSOUT
+{
+	vec3 world_pos;
+	vec3 normal;
+	vec3 color;
+}vs_out;
+
+void main()
+{
+	gl_Position = proj_mat * view_mat * model_mat * vec4(position, 1.0f);
+	vs_out.world_pos = vec3(model_mat * vec4(position, 1.0f));
+	vs_out.normal = mat3(transpose(inverse(model_mat))) * normal;
+	vs_out.color = color;
 }

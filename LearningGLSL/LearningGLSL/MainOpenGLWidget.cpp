@@ -7,7 +7,7 @@
 
 #include <QFileDialog>
 
-GLuint PDVBO, PDVAO, PLVBO, PLVAO;
+GLuint VBOObj, VAOObj;
 
 bool MainOpenGLWidget::m_transparent = false;
 
@@ -23,6 +23,8 @@ MainOpenGLWidget::MainOpenGLWidget(QWidget *parent)
 		fmt.setAlphaBufferSize(8);
 		setFormat(fmt);
 	}
+
+	m_object_3d = new Objects3D("Data/OFFData/Armadillo.off");
 }
 
 MainOpenGLWidget::~MainOpenGLWidget()
@@ -102,21 +104,17 @@ void MainOpenGLWidget::initializeGL()
 	m_core = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_5_Core>();
 	m_shader = new Shader("ShaderFiles/vertex_shader_source.vert", "ShaderFiles/fragment_shader_source.frag");
 
-	GLfloat vertices[] = {
-		0.0f, 0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // Top
-		-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // Bottom Left
-		0.5f,  -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,   // Bottom Right
-	};
-
-	m_core->glGenVertexArrays(1, &PDVAO);
-	m_core->glGenBuffers(1, &PDVBO);
-	m_core->glBindVertexArray(PDVAO);
-	m_core->glBindBuffer(GL_ARRAY_BUFFER, PDVBO);
-	m_core->glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * (3 * 6), vertices, GL_STATIC_DRAW);
-	m_core->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)0);
+	m_core->glGenVertexArrays(1, &VAOObj);
+	m_core->glGenBuffers(1, &VBOObj);
+	m_core->glBindVertexArray(VAOObj);
+	m_core->glBindBuffer(GL_ARRAY_BUFFER, VBOObj);
+	m_core->glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * (m_object_3d->m_num_faces * 3 * 9), m_object_3d->m_vertices_data, GL_STATIC_DRAW);
+	m_core->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (void*)0);
 	m_core->glEnableVertexAttribArray(0);
-	m_core->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	m_core->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 	m_core->glEnableVertexAttribArray(1);
+	m_core->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
+	m_core->glEnableVertexAttribArray(2);
 
 	m_core->glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
@@ -139,23 +137,19 @@ void MainOpenGLWidget::paintGL()
 	m_core->glEnable(GL_DEPTH_TEST);
 	m_core->glEnable(GL_CULL_FACE);
 
-	GLfloat vertices[] = {
-		0.0f, 0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // Top
-		-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // Bottom Left
-		0.5f,  -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,   // Bottom Right
-	};
-
 	if (m_is_reload)
 	{
-		m_core->glGenVertexArrays(1, &PDVAO);
-		m_core->glGenBuffers(1, &PDVBO);
-		m_core->glBindVertexArray(PDVAO);
-		m_core->glBindBuffer(GL_ARRAY_BUFFER, PDVBO);
-		m_core->glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * (3 * 6), vertices, GL_STATIC_DRAW);
-		m_core->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)0);
+		m_core->glGenVertexArrays(1, &VAOObj);
+		m_core->glGenBuffers(1, &VBOObj);
+		m_core->glBindVertexArray(VAOObj);
+		m_core->glBindBuffer(GL_ARRAY_BUFFER, VBOObj);
+		m_core->glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * (m_object_3d->m_num_faces * 3 * 6), m_object_3d->m_vertices_data, GL_STATIC_DRAW);
+		m_core->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (void*)0);
 		m_core->glEnableVertexAttribArray(0);
-		m_core->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+		m_core->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 		m_core->glEnableVertexAttribArray(1);
+		m_core->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
+		m_core->glEnableVertexAttribArray(2);
 
 		m_is_reload = false;
 	}
@@ -165,16 +159,26 @@ void MainOpenGLWidget::paintGL()
 	m_world.rotate(m_yRot / 16.0f, 0, 1, 0);
 	m_world.rotate(m_zRot / 16.0f, 0, 0, 1);
 
+	m_a_light_pos = QVector3D(0.0, 2.0, 3.0);
+	m_a_light_pos = QVector3D(0.0, 2.0, -3.0);
+	m_view_pos = QVector3D(0.0, 0.0, 2.0);
+
 	m_shader->use();
-	m_core->glBindVertexArray(PDVAO);
-	m_projMatrixLoc = m_shader->shader_program.uniformLocation("projMatrix");
-	m_mvMatrixLoc = m_shader->shader_program.uniformLocation("mvMatrix");
+	m_core->glBindVertexArray(VAOObj);
+	m_projMatrixLoc = m_shader->shader_program.uniformLocation("proj_mat");
+	m_modelMatrixLoc = m_shader->shader_program.uniformLocation("model_mat");
+	m_viewMatrixLoc = m_shader->shader_program.uniformLocation("view_mat");
+	m_aLightPosLoc = m_shader->shader_program.uniformLocation("a_light_pos");
+	m_bLightPosLoc = m_shader->shader_program.uniformLocation("b_light_pos");
+	m_viewPosLoc = m_shader->shader_program.uniformLocation("view_pos");
 
 	m_shader->shader_program.setUniformValue(m_projMatrixLoc, m_proj);
-	m_shader->shader_program.setUniformValue(m_mvMatrixLoc, m_camera * m_world);
-	m_core->glPointSize(5);
-	// m_core->glDrawArrays(GL_TRIANGLES, 0, 3);
-	m_core->glDrawArrays(GL_POINTS, 0, 3);
+	m_shader->shader_program.setUniformValue(m_modelMatrixLoc, m_world);
+	m_shader->shader_program.setUniformValue(m_viewMatrixLoc, m_camera);
+	m_shader->shader_program.setUniformValue(m_aLightPosLoc, m_a_light_pos);
+	m_shader->shader_program.setUniformValue(m_bLightPosLoc, m_b_light_pos);
+	m_shader->shader_program.setUniformValue(m_viewPosLoc, m_view_pos);
+	m_core->glDrawArrays(GL_TRIANGLES, 0, m_object_3d->m_num_faces * 3);
 
 	m_shader->shader_program.release();
 }
